@@ -1,0 +1,8 @@
+aiogram
+httplib2
+google-api-python-client
+oauth2client
+aioschedule
+peewee
+peewee-migrations
+psycopg2-binary

@@ -1,71 +1,64 @@
-from datetime import datetime, date, timedelta
-from aiogram.bot import bot
-import asyncio
+from datetime import datetime
 
-from bot.data.config import service, spreadsheet_id, BOT_TOKEN
-from bot.loader import db
-
-
-async def send_message(id, text):
-    await bot.send_message(id, text)
+from .google_api import google_client
+from .models import User
+from . import bot
+from . import settings
 
 
 async def job():
-    otvet1 = service.spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id,
+    times_1 = google_client.spreadsheets().values().get(
+        spreadsheetId=settings.SPREADSHEET_ID,
         range='A1:A900',
         majorDimension='ROWS'
     ).execute()
 
-    otvet2 = service.spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id,
+    times_2 = google_client.spreadsheets().values().get(
+        spreadsheetId=settings.SPREADSHEET_ID,
         range='C1:C900',
         majorDimension='ROWS'
     ).execute()
 
-    otvet3 = service.spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id,
+    times_3 = google_client.spreadsheets().values().get(
+        spreadsheetId=settings.SPREADSHEET_ID,
         range='E1:E900',
         majorDimension='ROWS'
     ).execute()
 
-    lesson1 = service.spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id,
+    lessons_1 = google_client.spreadsheets().values().get(
+        spreadsheetId=settings.SPREADSHEET_ID,
         range='B1:B900',
         majorDimension='ROWS'
     ).execute()
 
-    lesson2 = service.spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id,
+    lessons_2 = google_client.spreadsheets().values().get(
+        spreadsheetId=settings.SPREADSHEET_ID,
         range='D1:D900',
         majorDimension='ROWS'
     ).execute()
 
-    lesson3 = service.spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id,
+    lessons_3 = google_client.spreadsheets().values().get(
+        spreadsheetId=settings.SPREADSHEET_ID,
         range='F1:F900',
         majorDimension='ROWS'
     ).execute()
 
     futured = datetime.now()
 
-    for i in range(0, 1000):
-        if otvet1['values'][i][0] == futured.strftime("%d.%m.%Y %H:%M"):
-            await send_message(int(db.get_id_group(groupi='1')[0]), f"Время пройти урок: {lesson1['values'][i][0]}")
+    for time, lesson in zip(times_1['values'], lessons_1['values']):
+        if time[0] == futured.strftime("%d.%m.%Y %H:%M"):
+            users = User.select(User.group == '1')
+            for user in users:
+                await bot.send_message(user.id, f"Время пройти урок: {lesson[0]}")
 
-    for j in range(0, 1000):
-        if otvet2['values'][j][0] == futured.strftime("%d.%m.%Y %H:%M"):
-            await send_message(int(db.get_id_group(groupi='2')[0]), f"Время пройти урок: {lesson2['values'][j][0]}")
+    for time, lesson in zip(times_2['values'], lessons_2['values']):
+        if time[0] == futured.strftime("%d.%m.%Y %H:%M"):
+            users = User.select(User.group == '2')
+            for user in users:
+                await bot.send_message(user.id, f"Время пройти урок: {lesson[0]}")
 
-    for k in range(0, 1000):
-        if otvet3['values'][k][0] == futured.strftime("%d.%m.%Y %H:%M"):
-            await send_message(int(db.get_id_group(groupi='3')[0]), f"Время пройти урок: {lesson3['values'][k][0]}")
-    print("1")
-    #await asyncio.sleep(1)
-
-'''
-schedule.every(1).seconds.do(job)
-schedule.every(5).to(10).days.do(job)
-schedule.every().hour.do(job)
-schedule.every().day.at("10:30").do(job)
-'''
+    for time, lesson in zip(times_3['values'], lessons_3['values']):
+        if time[0] == futured.strftime("%d.%m.%Y %H:%M"):
+            users = User.select(User.group == '3')
+            for user in users:
+                await bot.send_message(user.id, f"Время пройти урок: {lesson[0]}")
