@@ -47,18 +47,21 @@ async def job():
 
     for time, lesson in zip(times_1['values'], lessons_1['values']):
         if time[0] == futured.strftime("%d.%m.%Y %H:%M"):
-            users = User.select(User.group == '1')
+            users = User.select().where(User.group == '1')
+
             for user in users:
                 await bot.send_message(user.id, f"Время пройти урок: {lesson[0]}")
 
     for time, lesson in zip(times_2['values'], lessons_2['values']):
         if time[0] == futured.strftime("%d.%m.%Y %H:%M"):
-            users = User.select(User.group == '2')
+            users = User.select().where(User.group == '2')
+
             for user in users:
                 await bot.send_message(user.id, f"Время пройти урок: {lesson[0]}")
 
     for time, lesson in zip(times_3['values'], lessons_3['values']):
         if time[0] == futured.strftime("%d.%m.%Y %H:%M"):
-            users = User.select(User.group == '3')
+            users = User.select().where(User.group == '3')
+
             for user in users:
                 await bot.send_message(user.id, f"Время пройти урок: {lesson[0]}")

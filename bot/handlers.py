@@ -4,6 +4,7 @@ from aiogram.utils.markdown import hbold, hlink
 from peewee import IntegrityError
 import asyncio
 
+from bot.database import db
 from .dispatcher import dispatcher
 from . models import User
 
@@ -14,6 +15,7 @@ async def bot_start(message: types.Message):
     try:
         User.create(id=message.from_user.id, name=name)
     except IntegrityError:
+        db.rollback()
         await message.answer(
             text="Не удалось зарегестрировать пользователя!",
             disable_web_page_preview=True
@@ -38,7 +40,8 @@ async def enter_group(message: types.Message):
     group = message.text
     if group == '1' or group == '2' or group == '3':
         user = User.get(id=message.from_user.id)
-        user.update(group=group)
+        user.group = group
+        user.save()
         await message.answer(
             f'Данные были обновлены. '
             f'Запись в бд: id пользователя{user}, группа {user.group}'
